@@ -21,7 +21,7 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 img_path = sys.argv[1]
 path_split = os.path.split(img_path)
 filename = path_split[-1]
-img_dir = os.path.join(path_split[:-1])
+img_dir = os.path.join(*path_split[:-1])
 image = cv2.imread(img_path)
 
 if 'deskewed' not in filename:

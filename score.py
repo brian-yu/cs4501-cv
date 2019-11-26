@@ -2,8 +2,13 @@ import cv2
 import numpy as np
 import pickle
 import sys
+import os
+
 import torch
 import torchvision.models as models
+import torchvision.transforms as transforms
+import torch.nn as nn
+from PIL import Image
 
 
 tracks = pickle.load( open( "tracks.p", "rb" ) )
@@ -20,22 +25,32 @@ TRAIN_HEIGHT = 100
 img_path = sys.argv[1]
 path_split = os.path.split(img_path)
 filename = path_split[-1]
-img_dir = os.path.join(path_split[:-1])
+img_dir = os.path.join(*path_split[:-1])
 image = cv2.imread(img_path)
 
 prefix = filename.split(".")[0]
 
-# if 'deskewed' not in filename:
-#     scale_percent = 25 # percent of original size
-#     width = int(image.shape[1] * scale_percent / 100)
-#     height = int(image.shape[0] * scale_percent / 100)
-#     dim = (width, height)
-#     print(dim)
+def predict(image, model):
 
-#     image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+    label_names = ["red", "green", "blue", "black", "yellow", "none"]
 
+    preprocess = transforms.Compose([
+        transforms.Resize(224),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
 
-def deskew(image, pts, target_width, target_height):
+    img = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    input_img = preprocess(img).unsqueeze(0)
+
+    output = model(input_img)
+
+    pred = torch.argmax(output[0]).item()
+
+    return label_names[pred]
+
+def extract(image, pts, target_width, target_height):
 
     pts_src = np.array(pts)
 
@@ -56,53 +71,33 @@ print(f"{len(tracks)} tracks")
 model = models.resnet18(pretrained=True)
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, 6)
-model.load_state_dict(torch.load("ticket_to_ride_model.pt"))
+model.load_state_dict(torch.load("ticket_to_ride_model.pt", map_location='cpu'))
 model.eval()
 
+labeled_boxes = []
+print("Scoring...")
 for track in tracks:
-
-    # color = (random.randint(0, 255), random.randint(0, 255),
-    #     random.randint(0, 255))
-
     for box in track:
         pts = np.array(box, np.int32)
         pts = pts.reshape((-1,1,2))
 
-        deskew(image, box, TRAIN_WIDTH, TRAIN_HEIGHT)
+        box_img = extract(image, box, TRAIN_WIDTH, TRAIN_HEIGHT)
 
+        pred_color = predict(box_img, model)
+        labeled_boxes.append((pts, pred_color))
+print("Done")
+colors = {
+    "red": (0,0,255),
+    "green": (0,255,0),
+    "blue": (255,0,0),
+    "black": (0,0,0),
+    "yellow": (0,255,255),
+    "none": (255,255,255)
+}
 
-# track_idx = 0
-# while True:
-#     cv2.imshow('image',image)
-#     k = cv2.waitKey(0) & 0xFF
+for pts, color in labeled_boxes:
+    cv2.polylines(image,[pts],True, colors[color], 3)
 
-#     if k == 27:
-#         break
-#     elif k == ord('n'):
-#         if len(tracks[track_idx]) == 7:
-#             print(tracks[track_idx])
-#             print()
-#             print(tracks[track_idx][:5])
-#             print(tracks[track_idx][5:])
-#         for box in tracks[track_idx]:
-#             pts = np.array(box, np.int32)
-#             pts = pts.reshape((-1,1,2))
-            
-#             new_img = image.copy()
-
-#             cv2.polylines(new_img,[pts],True, (255, 255, 0) , 3)
-#             image = new_img
-#         track_idx += 1
-#     elif k == ord('d'):
-#         # print(mouseX,mouseY)
-#         print("DELETE")
-#         delete_point()
-
-#     elif k == ord('s'):
-#         # print(mouseX,mouseY)
-#         print("saving track")
-#         save_track()
-
-        
-
-# cv2.destroyAllWindows()
+cv2.imshow('board', image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
