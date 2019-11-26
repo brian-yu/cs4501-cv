@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import pickle
 import random
+import os
 
 '''
 WIDTH: 79.5 cm
@@ -17,8 +18,11 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 
 # filename = 'IMG_4087.jpg'
 # filename = 'IMG_4048_blank_deskewed.jpg'
-filename = sys.argv[1]
-image = cv2.imread(filename)
+img_path = sys.argv[1]
+path_split = os.path.split(img_path)
+filename = path_split[-1]
+img_dir = os.path.join(path_split[:-1])
+image = cv2.imread(img_path)
 
 if 'deskewed' not in filename:
     scale_percent = 25 # percent of original size
@@ -74,7 +78,7 @@ def deskew(image):
     im_out = cv2.warpPerspective(image, h, (WIDTH, HEIGHT))
 
     prefix = filename.split(".")[0]
-    cv2.imwrite(f"{prefix}_deskewed.jpg", im_out)
+    cv2.imwrite(os.path.join(img_dir, f"{prefix}_deskewed.jpg"), im_out)
 
     return im_out
 

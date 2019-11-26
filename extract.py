@@ -20,11 +20,11 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 TRAIN_WIDTH = 100
 TRAIN_HEIGHT = 100
 
-
-filename = 'IMG_4087_deskewed.jpg'
-filename = sys.argv[1]
-# filename = 'IMG_4048_blank_deskewed.jpg'
-image = cv2.imread(filename)
+img_path = sys.argv[1]
+path_split = os.path.split(img_path)
+filename = path_split[-1]
+img_dir = os.path.join(path_split[:-1])
+image = cv2.imread(img_path)
 
 prefix = filename.split(".")[0]
 
