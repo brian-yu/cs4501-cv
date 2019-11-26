@@ -40,13 +40,6 @@ for i, filename in enumerate(files):
     img = cv2.imread(img_path)
     cv2.imshow('image', img)
     k = cv2.waitKey(1) & 0xFF
-    
-    # img = Image.open(img_path)
-    # img.show()
-    
-    # imgplot = plt.imshow(mpimg.imread(img_path))
-    # plt.ion()
-    # plt.show()    
 
     label = ""
     while label not in classes:
