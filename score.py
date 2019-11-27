@@ -3,6 +3,8 @@ import numpy as np
 import pickle
 import sys
 import os
+from collections import Counter, defaultdict
+import time
 
 import torch
 import torchvision.models as models
@@ -75,17 +77,38 @@ model.load_state_dict(torch.load("ticket_to_ride_model.pt", map_location='cpu'))
 model.eval()
 
 labeled_boxes = []
+score_map = {
+    1: 1,
+    2: 2,
+    3: 4,
+    4: 7,
+    5: 10,
+    6: 15
+}
+color_scores = defaultdict(int)
+
 print("Scoring...")
+start = time.time()
 for track in tracks:
+    colors = Counter()
     for box in track:
-        pts = np.array(box, np.int32)
-        pts = pts.reshape((-1,1,2))
+        pts = np.array(box, np.int32).reshape((-1,1,2))
 
         box_img = extract(image, box, TRAIN_WIDTH, TRAIN_HEIGHT)
 
         pred_color = predict(box_img, model)
         labeled_boxes.append((pts, pred_color))
-print("Done")
+        colors[pred_color] += 1
+
+    color = colors.most_common(1)[0][0]
+
+    if color != 'none':
+        color_scores[color] += score_map[len(track)]
+
+print(f"Finished in {time.time() - start} seconds.")
+
+print(color_scores)
+
 colors = {
     "red": (0,0,255),
     "green": (0,255,0),
