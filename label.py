@@ -47,7 +47,7 @@ for i, filename in enumerate(files):
         if label in class_abbrev:
             label = class_abbrev[label]
 
-    plt.close()
+    # plt.close()
 
     labeled_image_path = os.path.join(sample_dir, f"{label}-{filename}")
 
