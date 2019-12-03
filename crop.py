@@ -4,6 +4,7 @@ import sys
 import pickle
 import random
 import os
+from argparse import ArgumentParser
 
 '''
 WIDTH: 79.5 cm
@@ -18,7 +19,12 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 
 # filename = 'IMG_4087.jpg'
 # filename = 'IMG_4048_blank_deskewed.jpg'
-img_path = sys.argv[1]
+# img_path = sys.argv[1]
+
+argparse = ArgumentParser(description='arg parser for cropping boards')
+argparse.add_argument('-i', '--image-path', type=str)
+args = argparse.parse_args()
+img_path = args.image_path
 path_split = os.path.split(img_path)
 filename = path_split[-1]
 img_dir = os.path.join(*path_split[:-1])
@@ -118,7 +124,7 @@ while True:
         print("saving track")
         save_track()
 
-        
+
 
 cv2.destroyAllWindows()
 
