@@ -76,7 +76,7 @@ def extract_from_image(img_path):
 
 
 paths = [
-    f"corner_samples/IMG_{num}.jpg" for num in "4168 4163 4143 4138 4134".split()]
+    f"corner_samples/IMG_{num}.jpg" for num in "4168 4163 4143 4138 4134 4155".split()]
 
 for img_path in paths:
     print(f"Extracting from {img_path}.")
