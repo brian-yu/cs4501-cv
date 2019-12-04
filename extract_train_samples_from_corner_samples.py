@@ -5,6 +5,7 @@ import math
 import sys
 import os
 import random
+import json
 
 '''
 WIDTH: 79.5 cm
@@ -24,13 +25,6 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 
 TRAIN_WIDTH = 100
 TRAIN_HEIGHT = 100
-
-img_path = sys.argv[1]
-path_split = os.path.split(img_path)
-filename = path_split[-1]
-img_dir = os.path.join(*path_split[:-1])
-image = cv2.imread(img_path)
-
 
 def deskew(image, pts, target_width, target_height):
     # print(pts)
@@ -79,6 +73,14 @@ def extract_from_image(img_path):
             cv2.imwrite(f"samples/{prefix}-{image_idx}.jpg", deskewed)
             image_idx += 1
 
+
+
+paths = [
+    f"corner_samples/IMG_{num}.jpg" for num in "4168 4163 4143 4138 4134".split()]
+
+for img_path in paths:
+    print(f"Extracting from {img_path}.")
+    extract_from_image(img_path)
 
 
 # track_idx = 0
