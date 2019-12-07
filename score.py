@@ -13,7 +13,7 @@ import torch.nn as nn
 from PIL import Image
 
 
-tracks = pickle.load( open( "tracks.p", "rb" ) )
+
 
 RATIO = 79.5 / 52.5
 WIDTH = 1500
@@ -21,16 +21,6 @@ HEIGHT = int(WIDTH / RATIO) # 990 if width = 1500
 
 TRAIN_WIDTH = 100
 TRAIN_HEIGHT = 100
-
-# EXPECT CROPPED + DESKEWED IMAGE FOR NOW
-
-img_path = sys.argv[1]
-path_split = os.path.split(img_path)
-filename = path_split[-1]
-img_dir = os.path.join(*path_split[:-1])
-image = cv2.imread(img_path)
-
-prefix = filename.split(".")[0]
 
 def predict(image, model):
 
@@ -67,6 +57,18 @@ def extract(image, pts, target_width, target_height):
 
     return im_out
 
+
+# EXPECT CROPPED + DESKEWED IMAGE FOR NOW
+
+tracks = pickle.load( open( "tracks.p", "rb" ) )
+
+img_path = sys.argv[1]
+path_split = os.path.split(img_path)
+filename = path_split[-1]
+img_dir = os.path.join(*path_split[:-1])
+image = cv2.imread(img_path)
+
+prefix = filename.split(".")[0]
 
 print(f"{len(tracks)} tracks")
 

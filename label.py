@@ -24,8 +24,8 @@ classes = {"red", "green", "blue", "black", "yellow", "none"}
 class_abbrev = {
     'r': 'red',
     'g': 'green',
-    'blu': 'blue',
-    'bla': 'black',
+    'u': 'blue',
+    'k': 'black',
     'y': 'yellow',
     'n': 'none'
 }

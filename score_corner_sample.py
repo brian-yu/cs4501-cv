@@ -43,9 +43,6 @@ def deskew(image, corner_pts):
 
     im_out = cv2.warpPerspective(image, h, (WIDTH, HEIGHT))
 
-    # prefix = filename.split(".")[0]
-    # cv2.imwrite(os.path.join(img_dir, f"{prefix}_deskewed.jpg"), im_out)
-
     return im_out
 
 def predict(image, model):
