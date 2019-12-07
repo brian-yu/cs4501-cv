@@ -69,7 +69,8 @@ def score(image):
     model.load_state_dict(torch.load("ticket_to_ride_model.pt", map_location='cpu'))
     model.eval()
 
-    labeled_boxes = []
+    # labeled_boxes = []
+    labeled_tracks = []
     score_map = {
         1: 1,
         2: 2,
@@ -90,7 +91,7 @@ def score(image):
             box_img = extract(image, box, TRAIN_WIDTH, TRAIN_HEIGHT)
 
             pred_color = predict(box_img, model)
-            labeled_boxes.append((pts, pred_color))
+            # labeled_boxes.append((pts, pred_color))
             colors[pred_color] += 1
 
         color = colors.most_common(1)[0][0]
@@ -98,12 +99,14 @@ def score(image):
         if color != 'none':
             color_scores[color] += score_map[len(track)]
 
+        labeled_tracks.append((track, color))
+
     print(f"Finished in {time.time() - start} seconds.")
 
     print("====== Scores ======")
     place = 0
     for color, score in sorted(color_scores.items(), key=lambda x: -x[1]):
-        print(f"{place}. {color.title()}: {score}")
+        print(f"{place + 1}. {color.title()}: {score}")
         place += 1
 
     colors = {
@@ -115,11 +118,17 @@ def score(image):
         "none": (255,255,255)
     }
 
-    for pts, color in labeled_boxes:
-        cv2.polylines(image,[pts],True, colors[color], 3)
+    # for pts, color in labeled_boxes:
+    #     cv2.polylines(image,[pts],True, colors[color], 3)
+
+    for track, color in labeled_tracks:
+        for box in track:
+            pts = np.array(box, np.int32).reshape((-1,1,2))
+            cv2.polylines(image,[pts],True, colors[color], 3)
 
 
-    return image
+
+    return image, color_scores
 
 
 
@@ -162,7 +171,7 @@ def on_mouse(event, x, y, flags, param):
 
 h, w, _ = image.shape
 
-image = cv2.rectangle(image, (30, h//2- 20), (w - 30, h//2+35), (0,0,0), -1)
+image = cv2.rectangle(image, (30, h//2- 20), (w - 30, h//2+65), (0,0,0), -1)
 
 image = cv2.putText(image,
     'Click on each corner of the board. Please try to be as accurate as possible.',
@@ -170,7 +179,11 @@ image = cv2.putText(image,
 
 image = cv2.putText(image,
     'Press \'d\' to undo a corner point',
-    (30, h//2+30), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA) 
+    (30, h//2+30), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA)
+
+image = cv2.putText(image,
+    'Press \'n\' after selecting corners to score the board.',
+    (30, h//2+60), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA) 
 
 cv2.imshow('board', image)
 
@@ -186,7 +199,6 @@ while True:
         
         pts = mouse_coords[-4:]
         sort_x = sorted(pts, key=lambda x: x[0])
-        sort_y = sorted(pts, key=lambda x: x[1])
 
         if sort_x[0][1] < sort_x[1][1]:
             top_left = sort_x[0]
@@ -204,7 +216,21 @@ while True:
 
         ordered_pts = [top_left, top_right, bottom_right, bottom_left]
         cropped = extract(source_image, ordered_pts, WIDTH, HEIGHT)
-        image = score(cropped)
+        image, scores = score(cropped)
+
+        h, w, _ = image.shape
+        start_x = 30
+        start_y = h - 200
+
+        image = cv2.rectangle(image, (start_x, start_y-30), (start_x+160, start_y+120), (0,0,0), -1)
+
+        place = 0
+        for color, score in sorted(scores.items(), key=lambda x: -x[1]):
+            image = cv2.putText(image, f"{place + 1}. {color.title()}: {score}",
+            (start_x, start_y + place * 25), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2,cv2.LINE_AA)
+            place += 1
+
+
         cv2.imshow('board', image)
 
     elif k == ord('d'):
