@@ -16,3 +16,9 @@
 
 `python score_board.py board_images/IMG_4066_deskewed.jpg`
 
+
+## Set up virtual env and all the requirements
+python3 -m pip install --user virtualenv
+python3 -m venv cvProjTicketToRide  #where you want virtual env
+source cvProjTicketToRide/bin/activate
+pip install requirements.txt 
