@@ -96,6 +96,12 @@ def score(image):
 
         color = colors.most_common(1)[0][0]
 
+        # if top 2 are tied and one of them is none, use the other color.
+        if len(colors) >= 2:
+            top_2 = colors.most_common(2)
+            if color == 'none' and top_2[0][1] == top_2[1][1]:
+                color = top_2[1][0]
+
         if color != 'none':
             color_scores[color] += score_map[len(track)]
 
@@ -151,7 +157,7 @@ def create_point(x, y):
 
     cv2.circle(image,(x,y),3,(255,255,0),-1)
     mouse_coords.append([x, y])
-    cv2.imshow('board',image)
+    cv2.imshow('ResNet to Ride',image)
 
 def delete_point():
     global mouse_coords, image
@@ -163,7 +169,7 @@ def delete_point():
     last_x, last_y = mouse_coords.pop()
 
     cv2.circle(image,(last_x, last_y), 3, (0,0,0), -1)
-    cv2.imshow('board',image)
+    cv2.imshow('ResNet to Ride',image)
 
 def on_mouse(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -185,12 +191,12 @@ image = cv2.putText(image,
     'Press \'n\' after selecting corners to score the board.',
     (30, h//2+60), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA) 
 
-cv2.imshow('board', image)
+cv2.imshow('ResNet to Ride', image)
 
-cv2.setMouseCallback('board', on_mouse)
+cv2.setMouseCallback('ResNet to Ride', on_mouse)
 
 while True:
-    cv2.imshow('board',image)
+    cv2.imshow('ResNet to Ride',image)
     k = cv2.waitKey(0) & 0xFF
     if k == 27:
         break
@@ -231,7 +237,7 @@ while True:
             place += 1
 
 
-        cv2.imshow('board', image)
+        cv2.imshow('ResNet to Ride', image)
 
     elif k == ord('d'):
         # print(mouseX,mouseY)
