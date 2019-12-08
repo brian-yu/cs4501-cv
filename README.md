@@ -17,7 +17,7 @@ pip install -r requirements.txt 
 
 ## Crop board images
 
-`python crop_board.py board_images/IMG_4133.jpg`
+`python crop_board.py -i board_images/IMG_4133.jpg`
 
 ## Extract track images (100x100)
 

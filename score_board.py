@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 import sys
 import os
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, OrderedDict
 import time
 
 import torch
@@ -39,7 +39,6 @@ def predict(image, model):
     output = model(input_img)
 
     pred = torch.argmax(output[0]).item()
-
     return label_names[pred]
 
 def extract(image, pts, target_width, target_height):
@@ -63,9 +62,17 @@ def score(image):
     tracks = pickle.load( open( "tracks.p", "rb" ) )
     print(f"{len(tracks)} tracks")
 
-    model = models.resnet18(pretrained=True)
+    model = models.resnet18()
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 6)
+    # model.fc = nn.Linear(num_ftrs, 6)
+    fc = nn.Sequential(OrderedDict([
+        ('fc1', nn.Linear(num_ftrs,100)),
+        ('relu', nn.ReLU()),
+        ('dropout', nn.Dropout(.2)),
+        ('fc2', nn.Linear(100,6)),
+        ('output', nn.LogSoftmax(dim=1))
+    ]))
+    model.fc = fc
     model.load_state_dict(torch.load("ticket_to_ride_model.pt", map_location='cpu'))
     model.eval()
 
@@ -189,7 +196,7 @@ image = cv2.putText(image,
 
 image = cv2.putText(image,
     'Press \'n\' after selecting corners to score the board.',
-    (30, h//2+60), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA) 
+    (30, h//2+60), cv2.FONT_HERSHEY_SIMPLEX, .75, (255, 255, 255) , 2, cv2.LINE_AA)
 
 cv2.imshow('ResNet to Ride', image)
 
@@ -202,7 +209,7 @@ while True:
         break
     elif k == ord('n'):
         print("Cropping board.")
-        
+
         pts = mouse_coords[-4:]
         sort_x = sorted(pts, key=lambda x: x[0])
 
