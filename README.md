@@ -1,4 +1,4 @@
-# cs4501-cv
+# ResNet to Ride: Automatic scoring of the Ticket to Ride board game
 
 # Score a board
 
