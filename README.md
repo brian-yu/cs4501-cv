@@ -2,7 +2,7 @@
 
 # Score a board
 
-1. `python score_board.py board_images/IMG_4066_deskewed.jpg`
+1. `python score_board.py board_images/IMG_4066.jpg`
 2. Select corners
 3. Press 'n'!
 
