@@ -5,6 +5,7 @@ import sys
 import os
 from collections import Counter, defaultdict, OrderedDict
 import time
+from tqdm import tqdm
 
 import torch
 import torchvision.models as models
@@ -90,7 +91,7 @@ def score(image):
 
     print("Scoring...")
     start = time.time()
-    for track in tracks:
+    for i, track in enumerate(tqdm(tracks)):
         colors = Counter()
         for box in track:
             pts = np.array(box, np.int32).reshape((-1,1,2))
