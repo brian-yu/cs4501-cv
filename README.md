@@ -1,5 +1,7 @@
 # ResNet to Ride: Automatic scoring of the Ticket to Ride board game
 
+![final_score](results/scoring.png)
+
 # Score a board
 
 ```
