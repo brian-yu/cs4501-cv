@@ -27,4 +27,7 @@ pip install -r requirements.txt 
 
 `python label_track_images.py IMG_4066`
 
+## Edge detection with pretrained Caffe model 
 
+`cd edge_detection`
+`python edge.py --input ../board_images/IMG_4173.jpg`
