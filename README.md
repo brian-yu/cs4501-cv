@@ -1,5 +1,7 @@
 # ResNet to Ride: Automatic scoring of the Ticket to Ride board game
 
+![final_score](results/scoring.png)
+
 # Score a board
 
 ```
@@ -7,11 +9,8 @@ python3 -m pip install --user virtualenv
 python3 -m venv cvProjTicketToRide  #where you want virtual env
 source cvProjTicketToRide/bin/activate
 pip install -r requirements.txt 
+python score_board.py board_images/IMG_4066.jpg
 ```
-
-1. `python score_board.py board_images/IMG_4066.jpg`
-2. Select corners
-3. Press 'n'!
 
 # Dataset collection utilities
 
